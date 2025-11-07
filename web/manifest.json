@@ -1,6 +1,6 @@
 {
-    "name": "mobilegaleri",
-    "short_name": "mobilegaleri",
+    "name": "EduSpot",
+    "short_name": "EduSpot",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

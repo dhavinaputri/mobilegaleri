@@ -10,7 +10,7 @@ class BeritaPage extends StatefulWidget {
 }
 
 class _BeritaPageState extends State<BeritaPage> {
-  final categories = const ['Semua', 'Pengumuman', 'Kegiatan', 'Prestasi', 'Artikel'];
+  final categories = const ['Semua', 'Pengumuman', 'Kegiatan', 'Prestasi', 'Artikel', 'Event'];
   String selected = 'Semua';
 
   List<NewsItem> get filtered {
@@ -51,7 +51,17 @@ class _BeritaPageState extends State<BeritaPage> {
               final n = filtered[i];
               return Card(
                 child: ListTile(
-                  leading: const Icon(Icons.article_outlined),
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: n.imageUrl == null
+                        ? const Icon(Icons.article_outlined)
+                        : Image.network(
+                            n.imageUrl!,
+                            width: 56,
+                            height: 56,
+                            fit: BoxFit.cover,
+                          ),
+                  ),
                   title: Text(n.title),
                   subtitle: Text('${n.category} • ${_fmt(n.date)}\n${n.summary}'),
                   isThreeLine: true,

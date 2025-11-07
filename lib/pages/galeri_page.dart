@@ -10,7 +10,7 @@ class GaleriPage extends StatefulWidget {
 }
 
 class _GaleriPageState extends State<GaleriPage> {
-  final categories = const ['Semua', 'Kegiatan', 'Fasilitas', 'Prestasi'];
+  final categories = const ['Semua', 'Event', 'Akademik', 'Lomba', 'Kegiatan', 'Fasilitas', 'Prestasi'];
   String selected = 'Semua';
 
   List<GalleryItem> get filtered {

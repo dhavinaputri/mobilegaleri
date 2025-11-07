@@ -16,7 +16,13 @@ class BerandaPage extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
-            color: Colors.indigo.shade600,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1D4ED8), Color(0xFF6625AC)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -51,7 +57,7 @@ class BerandaPage extends StatelessWidget {
                         children: [
                           ElevatedButton.icon(
                             onPressed: () => Navigator.of(context).pushNamed(RoutePaths.gallery),
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.indigo, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12)),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: const Color(0xFF1D4ED8), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12)),
                             icon: const Icon(Icons.photo_library_outlined),
                             label: const Text('Lihat Galeri'),
                           ),
@@ -172,38 +178,26 @@ class BerandaPage extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Container(width: 4, height: 20, color: Colors.indigo),
+                    Container(width: 4, height: 20, color: const Color(0xFF1D4ED8)),
                     const SizedBox(width: 8),
-                    Text('Galeri Foto', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                    Text('Galeri Terbaru', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                   ],
                 ),
                 const SizedBox(height: 12),
                 if (galleries.isNotEmpty)
-                  LayoutBuilder(
-                    builder: (context, c) {
-                      final isWide = c.maxWidth > 520;
-                      final items = galleries.take(8).toList();
-                      if (isWide) {
-                        return GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 16/9),
-                          itemCount: items.length,
-                          itemBuilder: (context, i) {
-                            final g = items[i];
-                            return _GalleryCard(g: g);
-                          },
-                        );
-                      }
-                      return SizedBox(
-                        height: 160,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: items.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 10),
-                          itemBuilder: (context, i) => SizedBox(width: 260, child: _GalleryCard(g: items[i])),
-                        ),
-                      );
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      childAspectRatio: 1,
+                    ),
+                    itemCount: galleries.take(9).length,
+                    itemBuilder: (context, i) {
+                      final g = galleries[i];
+                      return _GalleryCard(g: g);
                     },
                   )
                 else
@@ -213,7 +207,7 @@ class BerandaPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Icon(Icons.photo_library_outlined, size: 48, color: Colors.indigo),
+                          const Icon(Icons.photo_library_outlined, size: 48, color: Color(0xFF1D4ED8)),
                           const SizedBox(height: 8),
                           Text('Galeri Foto Segera Hadir', style: Theme.of(context).textTheme.titleMedium),
                           const SizedBox(height: 4),

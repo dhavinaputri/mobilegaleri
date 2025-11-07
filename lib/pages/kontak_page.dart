@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/dummy_data.dart';
+import '../routes.dart';
 
 class KontakPage extends StatelessWidget {
   const KontakPage({super.key});
@@ -100,7 +101,13 @@ class _ContactFormState extends State<_ContactForm> {
             },
             icon: const Icon(Icons.send),
             label: const Text('Kirim'),
-          )
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () => Navigator.of(context).pushNamed(RoutePaths.chatbotAsk),
+            icon: const Icon(Icons.chat_bubble_outline),
+            label: const Text('Tanya Chatbot'),
+          ),
         ],
       ),
     );

@@ -5,6 +5,7 @@ import '../pages/berita_page.dart';
 import '../pages/galeri_page.dart';
 import '../pages/kontak_page.dart';
 import '../pages/login_guest_page.dart';
+import '../routes.dart';
 
 class AppScaffold extends StatefulWidget {
   const AppScaffold({super.key});
@@ -18,17 +19,26 @@ class _AppScaffoldState extends State<AppScaffold> {
 
   final _pages = const [
     BerandaPage(),
-    TentangPage(),
-    BeritaPage(),
     GaleriPage(),
-    KontakPage(),
+    BeritaPage(),
+    TentangPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SMKN 4 Bogor'),
+        title: const Text('EduSpot'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1D4ED8), Color(0xFF6625AC)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             tooltip: 'Masuk',
@@ -44,15 +54,23 @@ class _AppScaffoldState extends State<AppScaffold> {
         ],
       ),
       body: _pages[_index],
+      floatingActionButton: _index == 0
+          ? FloatingActionButton.extended(
+              onPressed: () => Navigator.of(context).pushNamed(RoutePaths.chatbotAsk),
+              icon: const Icon(Icons.chat_bubble_outline),
+              label: const Text('Chatbot'),
+              backgroundColor: scheme.primary,
+              foregroundColor: Colors.white,
+            )
+          : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Beranda'),
-          NavigationDestination(icon: Icon(Icons.info_outline), selectedIcon: Icon(Icons.info), label: 'Tentang'),
-          NavigationDestination(icon: Icon(Icons.article_outlined), selectedIcon: Icon(Icons.article), label: 'Berita'),
+          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(icon: Icon(Icons.photo_library_outlined), selectedIcon: Icon(Icons.photo_library), label: 'Galeri'),
-          NavigationDestination(icon: Icon(Icons.mail_outline), selectedIcon: Icon(Icons.mail), label: 'Kontak'),
+          NavigationDestination(icon: Icon(Icons.article_outlined), selectedIcon: Icon(Icons.article), label: 'Berita'),
+          NavigationDestination(icon: Icon(Icons.info_outline), selectedIcon: Icon(Icons.info), label: 'Tentang'),
         ],
       ),
     );

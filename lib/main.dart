@@ -3,27 +3,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'pages/splash_page.dart';
 import 'pages/login_guest_page.dart';
 import 'pages/home_page.dart';
+import 'pages/onboarding_page.dart';
+import 'pages/welcome_auth_page.dart';
+import 'routes.dart' as app_routes;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Inisialisasi SharedPreferences
-  final prefs = await SharedPreferences.getInstance();
-  final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-  
-  runApp(MyApp(initialRoute: isLoggedIn ? '/home' : '/'));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final String initialRoute;
-  
-  const MyApp({super.key, required this.initialRoute});
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SMKN 4 Bogor',
+      title: 'EduSpot',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -40,14 +36,20 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: const ColorScheme.light().copyWith(
+          primary: const Color(0xFF1D4ED8),
+          secondary: const Color(0xFF6625AC),
+        ),
       ),
-      initialRoute: initialRoute,
+      initialRoute: '/',
       routes: {
         '/': (context) => const SplashPage(),
         '/login': (context) => const LoginGuestPage(),
         '/home': (context) => const HomePage(),
+        '/onboarding': (context) => const OnboardingPage(),
+        '/welcome': (context) => const WelcomeAuthPage(),
       },
+      onGenerateRoute: app_routes.onGenerateRoute,
     );
   }
 }
