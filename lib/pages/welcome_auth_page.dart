@@ -21,14 +21,20 @@ class WelcomeAuthPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: 96,
-                    height: 96,
-                    decoration: BoxDecoration(
-                      color: scheme.primaryContainer,
-                      shape: BoxShape.circle,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      'assets/images/eduspot_logo.png',
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 96,
+                        height: 96,
+                        decoration: BoxDecoration(color: scheme.primaryContainer, shape: BoxShape.circle),
+                        child: Icon(Icons.school_rounded, size: 56, color: scheme.onPrimaryContainer),
+                      ),
                     ),
-                    child: Icon(Icons.school_rounded, size: 56, color: scheme.onPrimaryContainer),
                   ),
                   const SizedBox(height: 16),
                   Text(
