@@ -24,7 +24,7 @@ class WelcomeAuthPage extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: Image.asset(
-                      'assets/images/eduspot_logo.png',
+                      'assets/images/eduspotlogo.png',
                       width: 120,
                       height: 120,
                       fit: BoxFit.contain,
