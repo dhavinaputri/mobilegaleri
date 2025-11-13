@@ -100,12 +100,11 @@ class _AppScaffoldState extends State<AppScaffold> {
       ),
       body: _pages[_index],
       floatingActionButton: _index == 0
-          ? FloatingActionButton.extended(
+          ? FloatingActionButton(
               onPressed: () => Navigator.of(context).pushNamed(RoutePaths.chatbotAsk),
-              icon: const Icon(Icons.chat_rounded),
-              label: const Text('Chatbot'),
               backgroundColor: scheme.primary,
               foregroundColor: Colors.white,
+              child: const Icon(Icons.chat_rounded),
             )
           : null,
       bottomNavigationBar: NavigationBar(

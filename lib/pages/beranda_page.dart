@@ -546,16 +546,17 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                 ),
               ),
 
-              // LATEST NEWS
+              // BERITA TERKINI (CAROUSEL)
               Padding(
                 padding: EdgeInsets.fromLTRB(isDesktop ? 24 : 16, 20, isDesktop ? 24 : 16, 8),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(width: 4, height: 22, color: primaryBlue),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text('Berita Terbaru', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-                    ),
+                    Text('Berita Terkini',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge
+                            ?.copyWith(fontWeight: FontWeight.bold)),
                     TextButton(
                       onPressed: () => Navigator.of(context).pushNamed(RoutePaths.news),
                       child: const Text('Lihat semua'),
@@ -563,63 +564,110 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                   ],
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16),
+              SizedBox(
+                height: 200,
                 child: _loading
-                    ? Column(
-                        children: List.generate(3, (i) => Padding(padding: const EdgeInsets.only(bottom: 10), child: _ShimmerLine(height: 96, radius: 16, controller: _shimmerCtrl))),
+                    ? Padding(
+                        padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16),
+                        child: _ShimmerLine(
+                            controller: _shimmerCtrl, height: 200, radius: 18),
                       )
-                    : ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: news.take(3).length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    : PageView.builder(
+                        controller: _newsCtrl,
+                        onPageChanged: (i) => setState(() => _newsIndex = i),
+                        itemCount: news.length > 3 ? 3 : news.length,
                         itemBuilder: (context, i) {
                           final n = news[i];
-                          return _CardShine(
-                            child: InkWell(
-                              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => _NewsInlineDetail(item: n))),
-                              child: Card(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Row(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.network(
-                                          n.imageUrl ?? 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=400&q=80',
-                                          width: 110,
-                                          height: 74,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(n.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
-                                            const SizedBox(height: 4),
-                                            Text('${n.date.day}/${n.date.month}/${n.date.year}', style: Theme.of(context).textTheme.labelSmall),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              n.content,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: Theme.of(context).textTheme.bodySmall,
-                                            ),
+                          return Padding(
+                            padding: EdgeInsets.only(
+                                left: isDesktop ? 24 : 16, right: isDesktop ? 12 : 8),
+                            child: GestureDetector(
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (_) => _NewsInlineDetail(item: n)),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    Image.network(
+                                      n.imageUrl ??
+                                          'https://images.unsplash.com/photo-1520974741920-56b77315bd2d?auto=format&fit=crop&w=900&q=80',
+                                      fit: BoxFit.cover,
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.bottomCenter,
+                                          end: Alignment.topCenter,
+                                          colors: [
+                                            Colors.black.withOpacity(.5),
+                                            Colors.transparent
                                           ],
                                         ),
-                                      )
-                                    ],
-                                  ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(14),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(.9),
+                                              borderRadius:
+                                                  BorderRadius.circular(999),
+                                            ),
+                                            child: Text(
+                                              n.category,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          Text(
+                                            n.title,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 16,
+                                              height: 1.2,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
                           );
                         },
                       ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  news.length > 3 ? 3 : news.length,
+                  (i) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 240),
+                    width: _newsIndex == i ? 18 : 6,
+                    height: 6,
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    decoration: BoxDecoration(
+                      color: _newsIndex == i
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
               ),
 
               // GALLERY PREVIEW
@@ -719,29 +767,6 @@ class _ShimmerLine extends StatelessWidget {
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _ChipInfo extends StatelessWidget {
-  final String text;
-  const _ChipInfo({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEFF6FF),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: const Color(0xFF1D4ED8),
-              fontWeight: FontWeight.w700,
-            ),
       ),
     );
   }

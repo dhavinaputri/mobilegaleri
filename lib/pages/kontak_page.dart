@@ -103,10 +103,13 @@ class _ContactFormState extends State<_ContactForm> {
             label: const Text('Kirim'),
           ),
           const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: () => Navigator.of(context).pushNamed(RoutePaths.chatbotAsk),
-            icon: const Icon(Icons.chat_bubble_outline),
-            label: const Text('Tanya Chatbot'),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: IconButton(
+              tooltip: 'Chatbot',
+              onPressed: () => Navigator.of(context).pushNamed(RoutePaths.chatbotAsk),
+              icon: const Icon(Icons.chat_rounded),
+            ),
           ),
         ],
       ),
