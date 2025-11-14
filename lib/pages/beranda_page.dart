@@ -211,30 +211,32 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
         final isDesktop = w >= 1000;
         final isTablet = w >= 700 && w < 1000;
 
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // HEADER SUMMARY (avatar/logo + quick pill)
-              Padding(
-                padding: EdgeInsets.fromLTRB(isDesktop ? 24 : 16, 16, isDesktop ? 24 : 16, 0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
+        return Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // HEADER SUMMARY (avatar/logo + quick pill)
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(isDesktop ? 24 : 16, 16, isDesktop ? 24 : 16, 0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surface,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: Row(
+                            child: Row(
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(999),
@@ -459,93 +461,6 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                 ),
               ),
 
-              // SCHOOL BRIEF DESCRIPTION
-              Padding(
-                padding: EdgeInsets.fromLTRB(isDesktop ? 24 : 16, 16, isDesktop ? 24 : 16, 0),
-                child: Card(
-                  elevation: 8,
-                  surfaceTintColor: Colors.white,
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(18),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: const [
-                            Icon(Icons.school_outlined, color: Color(0xFF1D4ED8)),
-                            SizedBox(width: 8),
-                            Text('Profil Singkat', style: TextStyle(fontWeight: FontWeight.w800)),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'SMKN 4 Bogor berkomitmen membentuk generasi unggul yang berkarakter, kreatif, dan siap kerja. Visi kami adalah menghadirkan pendidikan vokasi yang modern, relevan dengan industri, dan berdampak bagi masyarakat.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: 8),
-                        const SizedBox(height: 6),
-                        Column(
-                          children: [
-                            _IconFeature(icon: Icons.apps_rounded, text: 'Kompetensi keahlian beragam'),
-                            const SizedBox(height: 8),
-                            _IconFeature(icon: Icons.handshake_rounded, text: 'Kolaborasi dengan industri'),
-                            const SizedBox(height: 8),
-                            _IconFeature(icon: Icons.apartment_rounded, text: 'Fasilitas modern'),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: const [
-                            Icon(Icons.category_outlined, color: Color(0xFF1D4ED8)),
-                            SizedBox(width: 8),
-                            Text('Program Keahlian', style: TextStyle(fontWeight: FontWeight.w800)),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Pilihan jurusan yang siap membekali siswa dengan keterampilan sesuai kebutuhan industri',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                        ),
-                        const SizedBox(height: 10),
-                        Column(
-                          children: const [
-                            _ProgramCard(
-                              title: 'PPLG',
-                              description: 'Pengembangan Perangkat Lunak dan Gim: fokus pada pemrograman, UI/UX, basis data, dan pembuatan gim.',
-                              icon: Icons.code_rounded,
-                              iconColor: Color(0xFF1D4ED8),
-                            ),
-                            SizedBox(height: 8),
-                            _ProgramCard(
-                              title: 'TJKT',
-                              description: 'Teknik Jaringan Komputer dan Telekomunikasi: perakitan, administrasi jaringan, server, dan keamanan jaringan.',
-                              icon: Icons.router_rounded,
-                              iconColor: Color(0xFF16A34A),
-                            ),
-                            SizedBox(height: 8),
-                            _ProgramCard(
-                              title: 'TPFL',
-                              description: 'Teknik Pengelasan dan Fabrikasi Logam: proses pengelasan, fabrikasi, keselamatan kerja, dan gambar teknik.',
-                              icon: Icons.handyman_rounded,
-                              iconColor: Color(0xFFF59E0B),
-                            ),
-                            SizedBox(height: 8),
-                            _ProgramCard(
-                              title: 'TKRO',
-                              description: 'Teknik Kendaraan Ringan Otomotif: perawatan dan perbaikan sistem mesin, chassis, kelistrikan, dan diagnosa.',
-                              icon: Icons.directions_car_filled_rounded,
-                              iconColor: Color(0xFFEF4444),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
               // BERITA TERKINI (CAROUSEL)
               Padding(
                 padding: EdgeInsets.fromLTRB(isDesktop ? 24 : 16, 20, isDesktop ? 24 : 16, 8),
@@ -565,12 +480,12 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                 ),
               ),
               SizedBox(
-                height: 200,
+                height: 220,
                 child: _loading
                     ? Padding(
                         padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16),
                         child: _ShimmerLine(
-                            controller: _shimmerCtrl, height: 200, radius: 18),
+                            controller: _shimmerCtrl, height: 220, radius: 18),
                       )
                     : PageView.builder(
                         controller: _newsCtrl,
@@ -580,69 +495,89 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                           final n = news[i];
                           return Padding(
                             padding: EdgeInsets.only(
-                                left: isDesktop ? 24 : 16, right: isDesktop ? 12 : 8),
+                              left: isDesktop ? 24 : 16,
+                              right: isDesktop ? 12 : 8,
+                              bottom: 6,
+                            ),
                             child: GestureDetector(
                               onTap: () => Navigator.of(context).push(
                                 MaterialPageRoute(
                                     builder: (_) => _NewsInlineDetail(item: n)),
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    Image.network(
-                                      n.imageUrl ??
-                                          'https://images.unsplash.com/photo-1520974741920-56b77315bd2d?auto=format&fit=crop&w=900&q=80',
-                                      fit: BoxFit.cover,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(18),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(.12),
+                                      blurRadius: 18,
+                                      offset: const Offset(0, 10),
                                     ),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.bottomCenter,
-                                          end: Alignment.topCenter,
-                                          colors: [
-                                            Colors.black.withOpacity(.5),
-                                            Colors.transparent
+                                  ],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(18),
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      Image.network(
+                                        n.imageUrl ??
+                                            'https://images.unsplash.com/photo-1520974741920-56b77315bd2d?auto=format&fit=crop&w=900&q=80',
+                                        fit: BoxFit.cover,
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.bottomCenter,
+                                            end: Alignment.topCenter,
+                                            colors: [
+                                              Colors.black.withOpacity(.55),
+                                              Colors.transparent
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(14),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 6),
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    Colors.white.withOpacity(.9),
+                                                borderRadius:
+                                                    BorderRadius.circular(999),
+                                              ),
+                                              child: Text(
+                                                n.category,
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                              ),
+                                            ),
+                                            const Spacer(),
+                                            Text(
+                                              n.title,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w800,
+                                                fontSize: 16,
+                                                height: 1.2,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(14),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 6),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(.9),
-                                              borderRadius:
-                                                  BorderRadius.circular(999),
-                                            ),
-                                            child: Text(
-                                              n.category,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.w700),
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          Text(
-                                            n.title,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w800,
-                                              fontSize: 16,
-                                              height: 1.2,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -684,22 +619,37 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16),
                 child: _loading
-                    ? _SkeletonGrid(controller: _shimmerCtrl, itemCount: 8, aspect: 1, columns: isDesktop ? 4 : isTablet ? 3 : 2)
+                    ? _SkeletonGrid(controller: _shimmerCtrl, itemCount: 6, aspect: 0.8, columns: 2)
                     : GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: isDesktop ? 4 : isTablet ? 3 : 2,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
-                          childAspectRatio: 1,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 14,
+                          crossAxisSpacing: 14,
+                          childAspectRatio: 0.8,
                         ),
-                        itemCount: galleries.length,
+                        itemCount: galleries.length > 6 ? 6 : galleries.length,
                         itemBuilder: (context, i) {
                           final g = galleries[i];
                           return _HoverScale(
-                            child: _CardShine(
-                              child: _GalleryCard(g: g),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(18),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(.06),
+                                    blurRadius: 14,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(18),
+                                child: _CardShine(
+                                  child: _GalleryCard(g: g),
+                                ),
+                              ),
                             ),
                           );
                         },
@@ -719,6 +669,8 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                 ),
             ],
           ),
+        ),
+          ],
         );
       },
     );

@@ -27,6 +27,7 @@ class _AppScaffoldState extends State<AppScaffold> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
+      extendBody: true,
       appBar: AppBar(
         titleSpacing: 16,
         title: Column(
@@ -98,24 +99,160 @@ class _AppScaffoldState extends State<AppScaffold> {
           ),
         ),
       ),
-      body: _pages[_index],
-      floatingActionButton: _index == 0
-          ? FloatingActionButton(
-              onPressed: () => Navigator.of(context).pushNamed(RoutePaths.chatbotAsk),
-              backgroundColor: scheme.primary,
-              foregroundColor: Colors.white,
-              child: const Icon(Icons.chat_rounded),
-            )
-          : null,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.photo_library_outlined), selectedIcon: Icon(Icons.photo_library), label: 'Galeri'),
-          NavigationDestination(icon: Icon(Icons.article_outlined), selectedIcon: Icon(Icons.article), label: 'Berita'),
-          NavigationDestination(icon: Icon(Icons.info_outline), selectedIcon: Icon(Icons.info), label: 'Tentang'),
+      body: Stack(
+        children: [
+          _pages[_index],
+          // Upload FAB (upper) with tab-switch animation
+          Positioned(
+            right: 16,
+            bottom: 216,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 220),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              transitionBuilder: (child, anim) => FadeTransition(
+                opacity: anim,
+                child: ScaleTransition(scale: Tween(begin: .95, end: 1.0).animate(anim), child: child),
+              ),
+              child: FloatingActionButton(
+                key: ValueKey('fab_upload_$_index'),
+                heroTag: 'fab_upload_global',
+                onPressed: () => Navigator.of(context).pushNamed(RoutePaths.gallerySubmit),
+                backgroundColor: scheme.primary,
+                foregroundColor: Colors.white,
+                child: Image.asset(
+                  'assets/icons/add.png',
+                  width: 24,
+                  height: 24,
+                  color: scheme.onPrimary,
+                ),
+              ),
+            ),
+          ),
+          // Chatbot FAB (lower) with tab-switch animation
+          Positioned(
+            right: 16,
+            bottom: 136,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 220),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              transitionBuilder: (child, anim) => FadeTransition(
+                opacity: anim,
+                child: ScaleTransition(scale: Tween(begin: .95, end: 1.0).animate(anim), child: child),
+              ),
+              child: FloatingActionButton(
+                key: ValueKey('fab_chatbot_$_index'),
+                heroTag: 'fab_chatbot_global',
+                onPressed: () => Navigator.of(context).pushNamed(RoutePaths.chatbotAsk),
+                backgroundColor: scheme.primary,
+                foregroundColor: Colors.white,
+                child: Image.asset(
+                  'assets/icons/chatbot.png',
+                  width: 24,
+                  height: 24,
+                  color: scheme.onPrimary,
+                ),
+              ),
+            ),
+          ),
         ],
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Material(
+          elevation: 14,
+          shadowColor: Colors.black.withOpacity(.20),
+          borderRadius: BorderRadius.circular(22),
+          clipBehavior: Clip.antiAlias,
+          child: Container(
+            color: scheme.primary,
+            child: SafeArea(
+              top: false,
+              child: SizedBox(
+                height: 56,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _NavItem(
+                      icon: Icons.home_outlined,
+                      activeIcon: Icons.home_rounded,
+                      label: 'Beranda',
+                      active: _index == 0,
+                      onTap: () => setState(() => _index = 0),
+                    ),
+                    _NavItem(
+                      icon: Icons.photo_library_outlined,
+                      activeIcon: Icons.photo_library_rounded,
+                      label: 'Galeri',
+                      active: _index == 1,
+                      onTap: () => setState(() => _index = 1),
+                    ),
+                    _NavItem(
+                      icon: Icons.article_outlined,
+                      activeIcon: Icons.article_rounded,
+                      label: 'Berita',
+                      active: _index == 2,
+                      onTap: () => setState(() => _index = 2),
+                    ),
+                    _NavItem(
+                      icon: Icons.info_outline_rounded,
+                      activeIcon: Icons.info_rounded,
+                      label: 'Tentang',
+                      active: _index == 3,
+                      onTap: () => setState(() => _index = 3),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+  const _NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.active,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = active ? Colors.white : Colors.white.withOpacity(.85);
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+        child: SizedBox(
+          height: 56,
+          width: 64,
+          child: Center(
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // soft shadow
+                Positioned(
+                  left: 0,
+                  top: 1,
+                  child: Icon(active ? activeIcon : icon, color: Colors.black.withOpacity(.28)),
+                ),
+                Icon(active ? activeIcon : icon, color: color),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
