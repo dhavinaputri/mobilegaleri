@@ -111,6 +111,53 @@ class _QuickActionCard extends StatelessWidget {
   }
 }
 
+class _GalleryCategoryChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  const _GalleryCategoryChip({required this.icon, required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Ink(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: scheme.primary.withOpacity(.15)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(.06),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: scheme.primary.withOpacity(.10),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              alignment: Alignment.center,
+              child: Icon(icon, size: 18, color: scheme.primary),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ProgramCard extends StatelessWidget {
   final String title;
   final String description;
@@ -227,12 +274,12 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             decoration: BoxDecoration(
                               color: Theme.of(context).colorScheme.surface,
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(18),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
+                                  color: Colors.black.withOpacity(0.06),
+                                  blurRadius: 14,
+                                  offset: const Offset(0, 8),
                                 ),
                               ],
                             ),
@@ -257,7 +304,7 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -320,24 +367,24 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                 ),
               ),
 
-              // HERO SECTION
+              // HERO SECTION (lebih ringan, fokus sambutan)
               Padding(
-                padding: EdgeInsets.fromLTRB(isDesktop ? 24 : 16, 16, isDesktop ? 24 : 16, 0),
+                padding: EdgeInsets.fromLTRB(isDesktop ? 24 : 16, 18, isDesktop ? 24 : 16, 0),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(18),
                   child: Stack(
                     children: [
                       AspectRatio(
-                        aspectRatio: isDesktop ? 21 / 7 : 16 / 12,
+                        aspectRatio: isDesktop ? 21 / 7 : 16 / 9,
                         child: Image.asset(
                           'assets/images/smkn4_hero.JPG',
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
                             decoration: const BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [Color(0xFF1D4ED8), Color(0xFF6625AC)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                                colors: [Color(0xFFE5EDFF), Color(0xFFD9E3FF)],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
                               ),
                             ),
                           ),
@@ -371,9 +418,9 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                         child: Container(
                           decoration: const BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [Color(0xB31D4ED8), Color(0xB36625AC)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+                              colors: [Color(0x801D4ED8), Color(0x806625AC)],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
                             ),
                           ),
                         ),
@@ -397,59 +444,18 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                                           height: 1.15,
                                           fontSize: isDesktop
                                               ? Theme.of(context).textTheme.headlineSmall?.fontSize
-                                              : 24,
+                                              : 22,
                                         ),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Eksplor kegiatan, berita, dan momen terbaik sekolah dalam satu aplikasi.',
-                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                          color: Colors.white.withOpacity(.9),
-                                          fontSize: isDesktop ? null : 14,
+                                    'Selamat datang di ruang digital SMKN 4 Bogor.\nTemukan momen terbaik, kegiatan, dan prestasi siswa melalui galeri dan berita.',
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                          color: Colors.white.withOpacity(.92),
+                                          height: 1.4,
+                                          fontSize: isDesktop ? null : 13,
                                         ),
                                   ),
-                                  const SizedBox(height: 12),
-                                  Container(
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.10),
-                                      borderRadius: BorderRadius.circular(999),
-                                      border: Border.all(color: Colors.white.withOpacity(0.25)),
-                                    ),
-                                    child: Wrap(
-                                      spacing: 10,
-                                      runSpacing: 10,
-                                      children: [
-                                        _HoverScale(
-                                          child: FilledButton.icon(
-                                            onPressed: () => Navigator.of(context).pushNamed(RoutePaths.gallery),
-                                            style: FilledButton.styleFrom(
-                                              backgroundColor: Colors.white,
-                                              foregroundColor: primaryBlue,
-                                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                                              shape: const StadiumBorder(),
-                                            ),
-                                            icon: const Icon(Icons.photo_library_rounded),
-                                            label: const Text('Lihat Galeri'),
-                                          ),
-                                        ),
-                                        _HoverScale(
-                                          child: OutlinedButton.icon(
-                                            onPressed: () => Navigator.of(context).pushNamed(RoutePaths.news),
-                                            style: OutlinedButton.styleFrom(
-                                              foregroundColor: Colors.white,
-                                              side: const BorderSide(color: Colors.white),
-                                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                                              shape: const StadiumBorder(),
-                                              backgroundColor: Colors.white.withOpacity(0.06),
-                                            ),
-                                            icon: const Icon(Icons.article_outlined),
-                                            label: const Text('Baca Berita'),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    ),
                                 ],
                               ),
                             ),
@@ -458,6 +464,37 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                       ),
                     ],
                   ),
+                ),
+              ),
+
+              // KATEGORI GALERI (ikon saja, rata kiri-kanan)
+              const SizedBox(height: 12),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: isDesktop ? 32 : 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _GalleryCategoryChip(
+                      icon: Icons.apps_rounded,
+                      label: 'Semua',
+                      onTap: () => Navigator.of(context).pushNamed(RoutePaths.gallery),
+                    ),
+                    _GalleryCategoryChip(
+                      icon: Icons.event_available_rounded,
+                      label: 'Kegiatan',
+                      onTap: () => Navigator.of(context).pushNamed('/gallery/category/kegiatan'),
+                    ),
+                    _GalleryCategoryChip(
+                      icon: Icons.apartment_rounded,
+                      label: 'Fasilitas Sekolah',
+                      onTap: () => Navigator.of(context).pushNamed('/gallery/category/fasilitas'),
+                    ),
+                    _GalleryCategoryChip(
+                      icon: Icons.emoji_events_rounded,
+                      label: 'Prestasi',
+                      onTap: () => Navigator.of(context).pushNamed('/gallery/category/prestasi'),
+                    ),
+                  ],
                 ),
               ),
 
@@ -619,7 +656,7 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16),
                 child: _loading
-                    ? _SkeletonGrid(controller: _shimmerCtrl, itemCount: 6, aspect: 0.8, columns: 2)
+                    ? _SkeletonGrid(controller: _shimmerCtrl, itemCount: 8, aspect: 0.8, columns: 2)
                     : GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -629,7 +666,7 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                           crossAxisSpacing: 14,
                           childAspectRatio: 0.8,
                         ),
-                        itemCount: galleries.length > 6 ? 6 : galleries.length,
+                        itemCount: galleries.length > 8 ? 8 : galleries.length,
                         itemBuilder: (context, i) {
                           final g = galleries[i];
                           return _HoverScale(

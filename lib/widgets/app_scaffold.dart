@@ -23,12 +23,69 @@ class _AppScaffoldState extends State<AppScaffold> {
     TentangPage(),
   ];
 
+  void _showChatbotSheet(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: scheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Chatbot EduSpot',
+                    style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Tanyakan apa saja seputar sekolah, program keahlian, atau informasi PPDB.',
+                style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(color: Theme.of(ctx).colorScheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                        Navigator.of(context).pushNamed(RoutePaths.chatbotAsk);
+                      },
+                      icon: const Icon(Icons.chat_bubble_outline_rounded),
+                      label: const Text('Buka Chat Lengkap'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: scheme.onSurface,
         titleSpacing: 16,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,29 +93,27 @@ class _AppScaffoldState extends State<AppScaffold> {
           children: [
             Text(
               'Hello, Tamu!',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800, color: Colors.white),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: scheme.primary,
+                  ),
             ),
             const SizedBox(height: 2),
             Text(
               'Selamat datang di EduSpot',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white.withOpacity(.9)),
+              style: Theme.of(context)
+                  .textTheme
+                  .labelMedium
+                  ?.copyWith(color: scheme.onSurfaceVariant),
             ),
           ],
         ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF1D4ED8), Color(0xFF6625AC)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
+        flexibleSpace: null,
         actions: [
           IconButton(
             tooltip: 'Notifikasi',
             onPressed: () => Navigator.of(context).pushNamed(RoutePaths.news),
-            icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
+            icon: Icon(Icons.notifications_none_rounded, color: scheme.primary),
           ),
           const SizedBox(width: 4),
           Padding(
@@ -68,8 +123,8 @@ class _AppScaffoldState extends State<AppScaffold> {
               onTap: () => Navigator.of(context).pushNamed(RoutePaths.guestLogin),
               child: CircleAvatar(
                 radius: 16,
-                backgroundColor: Colors.white.withOpacity(.2),
-                child: const Icon(Icons.person_outline_rounded, color: Colors.white),
+                backgroundColor: scheme.primary.withOpacity(.08),
+                child: Icon(Icons.person_outline_rounded, color: scheme.primary),
               ),
             ),
           ),
@@ -80,17 +135,17 @@ class _AppScaffoldState extends State<AppScaffold> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(.16),
+                color: scheme.surface,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white.withOpacity(.25)),
+                border: Border.all(color: scheme.outline.withOpacity(.18)),
               ),
               child: TextField(
-                style: const TextStyle(color: Colors.white),
-                cursorColor: Colors.white,
+                style: TextStyle(color: scheme.onSurface),
+                cursorColor: scheme.primary,
                 decoration: InputDecoration(
                   hintText: 'Cari berita, galeri, program...',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(.9)),
-                  prefixIcon: const Icon(Icons.search_rounded, color: Colors.white),
+                  hintStyle: TextStyle(color: scheme.onSurfaceVariant),
+                  prefixIcon: Icon(Icons.search_rounded, color: scheme.primary),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 ),
@@ -105,7 +160,7 @@ class _AppScaffoldState extends State<AppScaffold> {
           // Upload FAB (upper) with tab-switch animation
           Positioned(
             right: 16,
-            bottom: 216,
+            bottom: 188,
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 220),
               switchInCurve: Curves.easeOut,
@@ -132,7 +187,7 @@ class _AppScaffoldState extends State<AppScaffold> {
           // Chatbot FAB (lower) with tab-switch animation
           Positioned(
             right: 16,
-            bottom: 136,
+            bottom: 112,
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 220),
               switchInCurve: Curves.easeOut,
@@ -144,7 +199,7 @@ class _AppScaffoldState extends State<AppScaffold> {
               child: FloatingActionButton(
                 key: ValueKey('fab_chatbot_$_index'),
                 heroTag: 'fab_chatbot_global',
-                onPressed: () => Navigator.of(context).pushNamed(RoutePaths.chatbotAsk),
+                onPressed: () => _showChatbotSheet(context),
                 backgroundColor: scheme.primary,
                 foregroundColor: Colors.white,
                 child: Image.asset(
