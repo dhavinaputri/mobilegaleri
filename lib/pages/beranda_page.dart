@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import '../data/dummy_data.dart';
+import '../data/app_services.dart';
+import '../models/models.dart';
 import '../routes.dart';
 
 class BerandaPage extends StatefulWidget {
@@ -122,37 +123,56 @@ class _GalleryCategoryChip extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(right: 12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: onTap,
-        child: Ink(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: scheme.surface,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: scheme.primary.withOpacity(.15)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(.06),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Center(
-            child: Container(
-              width: 34,
-              height: 34,
+            onTap: onTap,
+            child: Ink(
+              width: 64,
+              height: 64,
               decoration: BoxDecoration(
-                color: scheme.primary.withOpacity(.10),
-                borderRadius: BorderRadius.circular(999),
+                color: scheme.surface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: scheme.primary.withOpacity(.15)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(.06),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
               ),
-              alignment: Alignment.center,
-              child: Icon(icon, size: 18, color: scheme.primary),
+              child: Center(
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: scheme.primary.withOpacity(.10),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(icon, size: 18, color: scheme.primary),
+                ),
+              ),
             ),
           ),
-        ),
+          const SizedBox(height: 6),
+          SizedBox(
+            width: 72,
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -228,15 +248,15 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
   late final PageController _newsCtrl;
   int _newsIndex = 0;
 
+  List<NewsItem> _news = [];
+  List<GalleryItem> _galleries = [];
+
   @override
   void initState() {
     super.initState();
     _shimmerCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600))..repeat();
     _newsCtrl = PageController(viewportFraction: .9);
-    // Simulasi loading singkat untuk menampilkan skeleton shimmer
-    Timer(const Duration(milliseconds: 1000), () {
-      if (mounted) setState(() => _loading = false);
-    });
+    _loadHomeData();
   }
 
   @override
@@ -246,10 +266,58 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
     super.dispose();
   }
 
+  Future<void> _loadHomeData() async {
+    try {
+      // Ambil berita
+      final rawNews = await apiService.listNews(page: 1);
+      List<NewsItem> newsItems = [];
+      if (rawNews is Map<String, dynamic> && rawNews['data'] is List) {
+        final list = rawNews['data'] as List;
+        newsItems = list
+            .whereType<Map<String, dynamic>>()
+            .map((e) => NewsItem.fromApi(e))
+            .toList();
+      } else if (rawNews is List) {
+        newsItems = rawNews
+            .whereType<Map<String, dynamic>>()
+            .map((e) => NewsItem.fromApi(e))
+            .toList();
+      }
+
+      // Ambil galeri
+      final rawGalleries = await apiService.listGallery(page: 1);
+      List<GalleryItem> galleryItems = [];
+      if (rawGalleries is Map<String, dynamic> && rawGalleries['data'] is List) {
+        final list = rawGalleries['data'] as List;
+        galleryItems = list
+            .whereType<Map<String, dynamic>>()
+            .map((e) => GalleryItem.fromApi(e))
+            .toList();
+      } else if (rawGalleries is List) {
+        galleryItems = rawGalleries
+            .whereType<Map<String, dynamic>>()
+            .map((e) => GalleryItem.fromApi(e))
+            .toList();
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _news = newsItems;
+        _galleries = galleryItems;
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final news = DummyData.news.take(6).toList();
-    final galleries = DummyData.gallery.take(8).toList();
+    final news = _news.take(6).toList();
+    final galleries = _galleries.take(8).toList();
     const primaryBlue = Color(0xFF1D4ED8);
 
     return LayoutBuilder(
@@ -475,11 +543,6 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _GalleryCategoryChip(
-                      icon: Icons.apps_rounded,
-                      label: 'Semua',
-                      onTap: () => Navigator.of(context).pushNamed(RoutePaths.gallery),
-                    ),
-                    _GalleryCategoryChip(
                       icon: Icons.event_available_rounded,
                       label: 'Kegiatan',
                       onTap: () => Navigator.of(context).pushNamed('/gallery/category/kegiatan'),
@@ -493,6 +556,11 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                       icon: Icons.emoji_events_rounded,
                       label: 'Prestasi',
                       onTap: () => Navigator.of(context).pushNamed('/gallery/category/prestasi'),
+                    ),
+                    _GalleryCategoryChip(
+                      icon: Icons.apps_rounded,
+                      label: 'Semua',
+                      onTap: () => Navigator.of(context).pushNamed(RoutePaths.gallery),
                     ),
                   ],
                 ),
@@ -524,103 +592,114 @@ class _BerandaPageState extends State<BerandaPage> with SingleTickerProviderStat
                         child: _ShimmerLine(
                             controller: _shimmerCtrl, height: 220, radius: 18),
                       )
-                    : PageView.builder(
-                        controller: _newsCtrl,
-                        onPageChanged: (i) => setState(() => _newsIndex = i),
-                        itemCount: news.length > 3 ? 3 : news.length,
-                        itemBuilder: (context, i) {
-                          final n = news[i];
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              left: isDesktop ? 24 : 16,
-                              right: isDesktop ? 12 : 8,
-                              bottom: 6,
+                    : (news.isEmpty
+                        ? Center(
+                            child: Text(
+                              'Belum ada berita.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium,
                             ),
-                            child: GestureDetector(
-                              onTap: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (_) => _NewsInlineDetail(item: n)),
-                              ),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(18),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(.12),
-                                      blurRadius: 18,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
+                          )
+                        : PageView.builder(
+                            controller: _newsCtrl,
+                            onPageChanged: (i) => setState(() => _newsIndex = i),
+                            itemCount: news.length > 3 ? 3 : news.length,
+                            itemBuilder: (context, i) {
+                              final n = news[i];
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  left: isDesktop ? 24 : 16,
+                                  right: isDesktop ? 12 : 8,
+                                  bottom: 6,
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(18),
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    children: [
-                                      Image.network(
-                                        n.imageUrl ??
-                                            'https://images.unsplash.com/photo-1520974741920-56b77315bd2d?auto=format&fit=crop&w=900&q=80',
-                                        fit: BoxFit.cover,
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.bottomCenter,
-                                            end: Alignment.topCenter,
-                                            colors: [
-                                              Colors.black.withOpacity(.55),
-                                              Colors.transparent
-                                            ],
+                                child: GestureDetector(
+                                  onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (_) => _NewsInlineDetail(item: n)),
+                                  ),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(18),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(.12),
+                                          blurRadius: 18,
+                                          offset: const Offset(0, 10),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(18),
+                                      child: Stack(
+                                        fit: StackFit.expand,
+                                        children: [
+                                          Image.network(
+                                            n.imageUrl ??
+                                                'https://images.unsplash.com/photo-1520974741920-56b77315bd2d?auto=format&fit=crop&w=900&q=80',
+                                            fit: BoxFit.cover,
                                           ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(14),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 6),
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    Colors.white.withOpacity(.9),
-                                                borderRadius:
-                                                    BorderRadius.circular(999),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                begin: Alignment.bottomCenter,
+                                                end: Alignment.topCenter,
+                                                colors: [
+                                                  Colors.black.withOpacity(.55),
+                                                  Colors.transparent
+                                                ],
                                               ),
-                                              child: Text(
-                                                n.category,
-                                                style: const TextStyle(
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(14),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 6),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white
+                                                        .withOpacity(.9),
+                                                    borderRadius:
+                                                        BorderRadius.circular(999),
+                                                  ),
+                                                  child: Text(
+                                                    n.category,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w700),
+                                                  ),
+                                                ),
+                                                const Spacer(),
+                                                Text(
+                                                  n.title,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
                                                     fontWeight:
-                                                        FontWeight.w700),
-                                              ),
+                                                        FontWeight.w800,
+                                                    fontSize: 16,
+                                                    height: 1.2,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            const Spacer(),
-                                            Text(
-                                              n.title,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w800,
-                                                fontSize: 16,
-                                                height: 1.2,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                              );
+                            },
+                          )),
               ),
               const SizedBox(height: 8),
               Row(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../data/dummy_data.dart';
+import '../../data/app_services.dart';
 import '../../models/gallery_item.dart';
 
 class GalleryDetailPage extends StatefulWidget {
@@ -19,8 +19,26 @@ class _GalleryDetailPageState extends State<GalleryDetailPage> {
     'Fotonya bagus.',
   ];
 
-  GalleryItem? get item =>
-      DummyData.gallery.firstWhere((g) => g.id == widget.id, orElse: () => DummyData.gallery.first);
+  GalleryItem? item;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDetail();
+  }
+
+  Future<void> _loadDetail() async {
+    try {
+      final raw = await apiService.galleryDetail(widget.id);
+      if (raw is Map<String, dynamic>) {
+        setState(() {
+          item = GalleryItem.fromApi(raw);
+        });
+      }
+    } catch (_) {
+      // Biarkan UI menampilkan keadaan kosong jika gagal memuat
+    }
+  }
 
   @override
   void dispose() {
@@ -55,52 +73,27 @@ class _GalleryDetailPageState extends State<GalleryDetailPage> {
   }
 
   void _openFullView(GalleryItem current) {
-    final all = DummyData.gallery;
-    final startIndex = all.indexWhere((g) => g.id == current.id).clamp(0, all.length - 1);
-
     Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
         barrierColor: Colors.black.withOpacity(.9),
         pageBuilder: (ctx, _, __) {
-          final controller = PageController(initialPage: startIndex);
           return GestureDetector(
             onTap: () => Navigator.of(ctx).pop(),
             child: Scaffold(
               backgroundColor: Colors.black.withOpacity(.9),
-              body: SafeArea(
-                child: Stack(
-                  children: [
-                    PageView.builder(
-                      controller: controller,
-                      itemCount: all.length,
-                      itemBuilder: (context, index) {
-                        final gi = all[index];
-                        return Center(
-                          child: Hero(
-                            tag: 'gallery-full-${gi.id}',
-                            child: InteractiveViewer(
-                              child: AspectRatio(
-                                aspectRatio: 3 / 2,
-                                child: Image.network(
-                                  gi.imageUrl,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    Positioned(
-                      top: 12,
-                      right: 12,
-                      child: IconButton(
-                        icon: const Icon(Icons.close_rounded, color: Colors.white),
-                        onPressed: () => Navigator.of(ctx).pop(),
+              body: Center(
+                child: Hero(
+                  tag: 'gallery-full-${current.id}',
+                  child: InteractiveViewer(
+                    child: AspectRatio(
+                      aspectRatio: 3 / 2,
+                      child: Image.network(
+                        current.imageUrl,
+                        fit: BoxFit.contain,
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -185,33 +178,54 @@ class _GalleryDetailPageState extends State<GalleryDetailPage> {
                           ],
                         ),
                         const SizedBox(height: 12),
+                        // Aksi seperti Instagram: like, komentar, simpan
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            _buildIconAction(
-                              context: context,
-                              icon: liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                              active: liked,
-                              activeColor: Colors.redAccent,
-                              onTap: () => setState(() => liked = !liked),
+                            IconButton(
+                              icon: Icon(
+                                liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                                color: liked ? Colors.redAccent : scheme.onSurface,
+                              ),
+                              onPressed: () => setState(() => liked = !liked),
                             ),
-                            _buildIconAction(
-                              context: context,
-                              icon: favorited ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                              active: favorited,
-                              onTap: () => setState(() => favorited = !favorited),
-                            ),
-                            _buildIconAction(
-                              context: context,
-                              icon: Icons.download_rounded,
-                              active: false,
-                              onTap: () {
+                            const SizedBox(width: 4),
+                            IconButton(
+                              icon: Icon(Icons.mode_comment_outlined, color: scheme.onSurface),
+                              onPressed: () {
+                                // Arahkan pengguna untuk menggulir ke bagian komentar
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Fitur unduh akan segera hadir.')),
+                                  const SnackBar(content: Text('Scroll ke bawah untuk melihat dan menulis komentar.')),
                                 );
                               },
                             ),
+                            const SizedBox(width: 4),
+                            IconButton(
+                              icon: Icon(
+                                favorited ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                                color: favorited ? scheme.primary : scheme.onSurface,
+                              ),
+                              onPressed: () => setState(() => favorited = !favorited),
+                            ),
+                            const Spacer(),
                           ],
+                        ),
+                        const SizedBox(height: 4),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Fitur unduh akan segera hadir.')),
+                              );
+                            },
+                            icon: const Icon(Icons.download_rounded, size: 18),
+                            label: const Text('Unduh Foto'),
+                            style: OutlinedButton.styleFrom(
+                              visualDensity: VisualDensity.compact,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -296,46 +310,8 @@ class _GalleryDetailPageState extends State<GalleryDetailPage> {
             const SizedBox(height: 24),
             Text('Galeri Lainnya', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
-            SizedBox(
-              height: 140,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: DummyData.gallery.where((x) => x.id != g?.id).length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (ctx, i) {
-                  final others = DummyData.gallery.where((x) => x.id != g?.id).toList();
-                  final og = others[i];
-                  return InkWell(
-                    onTap: () => Navigator.of(context).pushReplacementNamed('/gallery/${og.id}'),
-                    child: SizedBox(
-                      width: 160,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(og.imageUrl, fit: BoxFit.cover, width: double.infinity),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            og.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodySmall,
-                          ),
-                          Text(
-                            _fmt(og.date),
-                            style: theme.textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+            // Untuk saat ini, daftar "Galeri Lainnya" belum diambil dari API secara terpisah.
+            // Bagian ini bisa diisi kemudian dengan pemanggilan API tambahan jika dibutuhkan.
           ],
         ),
       ),

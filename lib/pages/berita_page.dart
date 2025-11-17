@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../data/dummy_data.dart';
+import '../data/app_services.dart';
 import '../models/news_item.dart';
 
 class BeritaPage extends StatefulWidget {
@@ -21,16 +21,37 @@ class _BeritaPageState extends State<BeritaPage> {
   String selected = 'Semua';
   String query = '';
 
+  late Future<List<NewsItem>> _futureNews;
+
   String _mapToDataCategory(String chip) {
     if (chip == 'Kegiatan Sekolah') return 'Kegiatan';
     if (chip == 'Edukasi') return 'Artikel';
     return chip;
   }
 
-  List<NewsItem> get filtered {
+  @override
+  void initState() {
+    super.initState();
+    _futureNews = _loadNews();
+  }
+
+  Future<List<NewsItem>> _loadNews() async {
+    final raw = await apiService.listNews(page: 1);
+    // Laravel pagination: data biasanya berisi { data: [...], ... }
+    if (raw is Map<String, dynamic> && raw['data'] is List) {
+      final list = raw['data'] as List;
+      return list.map((e) => NewsItem.fromApi(e as Map<String, dynamic>)).toList();
+    }
+    if (raw is List) {
+      return raw.map((e) => NewsItem.fromApi(e as Map<String, dynamic>)).toList();
+    }
+    return <NewsItem>[];
+  }
+
+  List<NewsItem> _applyFilter(List<NewsItem> source) {
     final base = selected == 'Semua'
-        ? DummyData.news
-        : DummyData.news.where((n) => n.category == _mapToDataCategory(selected)).toList();
+        ? source
+        : source.where((n) => n.category == _mapToDataCategory(selected)).toList();
     if (query.isEmpty) return base;
     final q = query.toLowerCase();
     return base
@@ -109,134 +130,162 @@ class _BeritaPageState extends State<BeritaPage> {
             ),
             const SizedBox(height: 8),
             Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final isWide = constraints.maxWidth > 700;
-                  final crossAxisCount = isWide ? 3 : 2;
-                  final items = filtered;
+              child: FutureBuilder<List<NewsItem>>(
+                future: _futureNews,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        'Gagal memuat berita',
+                        style: theme.textTheme.bodyMedium?.copyWith(color: scheme.error),
+                      ),
+                    );
+                  }
 
-                  return GridView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: 14,
-                      mainAxisSpacing: 14,
-                      // Dibuat sedikit lebih tinggi agar konten kartu tidak overflow
-                      childAspectRatio: 0.62,
-                    ),
-                    itemCount: items.length,
-                    itemBuilder: (context, i) {
-                      final n = items[i];
-                      return InkWell(
-                        borderRadius: BorderRadius.circular(18),
-                        onTap: () => _openDetail(context, n),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: scheme.surface,
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(.05),
-                                blurRadius: 12,
-                                offset: const Offset(0, 6),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              AspectRatio(
-                                aspectRatio: 4 / 3,
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    children: [
-                                      if (n.imageUrl != null)
-                                        Image.network(n.imageUrl!, fit: BoxFit.cover)
-                                      else
-                                        Container(color: scheme.surfaceVariant),
-                                      Positioned(
-                                        top: 8,
-                                        right: 8,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: scheme.primary,
-                                            borderRadius: BorderRadius.circular(999),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              const Icon(Icons.event_rounded, color: Colors.white, size: 14),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                _fmt(n.date),
-                                                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(10, 8, 10, 2),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: scheme.primary.withOpacity(.08),
-                                    borderRadius: BorderRadius.circular(999),
-                                  ),
-                                  child: Text(
-                                    n.category,
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                          color: scheme.primary,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                child: Text(
-                                  n.title,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(10, 2, 10, 0),
-                                child: Text(
-                                  n.summary,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                                ),
-                              ),
-                              const Spacer(),
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(10, 4, 10, 10),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      'Baca selengkapnya',
-                                      style: theme.textTheme.labelMedium?.copyWith(
-                                            color: scheme.primary,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Icon(Icons.arrow_right_alt_rounded, color: scheme.primary, size: 18),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                  final all = snapshot.data ?? <NewsItem>[];
+                  final items = _applyFilter(all);
+
+                  if (items.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'Belum ada berita.',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    );
+                  }
+
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isWide = constraints.maxWidth > 700;
+                      final crossAxisCount = isWide ? 3 : 2;
+
+                      return GridView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: 14,
+                          mainAxisSpacing: 14,
+                          // Dibuat sedikit lebih tinggi agar konten kartu tidak overflow
+                          childAspectRatio: 0.62,
                         ),
+                        itemCount: items.length,
+                        itemBuilder: (context, i) {
+                          final n = items[i];
+                          return InkWell(
+                            borderRadius: BorderRadius.circular(18),
+                            onTap: () => _openDetail(context, n),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: scheme.surface,
+                                borderRadius: BorderRadius.circular(18),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(.05),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  AspectRatio(
+                                    aspectRatio: 4 / 3,
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+                                      child: Stack(
+                                        fit: StackFit.expand,
+                                        children: [
+                                          if (n.imageUrl != null)
+                                            Image.network(n.imageUrl!, fit: BoxFit.cover)
+                                          else
+                                            Container(color: scheme.surfaceVariant),
+                                          Positioned(
+                                            top: 8,
+                                            right: 8,
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: scheme.primary,
+                                                borderRadius: BorderRadius.circular(999),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const Icon(Icons.event_rounded, color: Colors.white, size: 14),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    _fmt(n.date),
+                                                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 2),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: scheme.primary.withOpacity(.08),
+                                        borderRadius: BorderRadius.circular(999),
+                                      ),
+                                      child: Text(
+                                        n.category,
+                                        style: theme.textTheme.labelSmall?.copyWith(
+                                              color: scheme.primary,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                    child: Text(
+                                      n.title,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(10, 2, 10, 0),
+                                    child: Text(
+                                      n.summary,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(10, 4, 10, 10),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          'Baca selengkapnya',
+                                          style: theme.textTheme.labelMedium?.copyWith(
+                                                color: scheme.primary,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Icon(Icons.arrow_right_alt_rounded, color: scheme.primary, size: 18),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                   );
@@ -264,7 +313,6 @@ class _NewsDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final others = DummyData.news.where((n) => n.id != item.id).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -455,75 +503,8 @@ class _NewsDetail extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            SizedBox(
-              height: 190,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: others.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (ctx, i) {
-                  final n = others[i];
-                  return SizedBox(
-                    width: 220,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (_) => _NewsDetail(item: n)),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: scheme.surface,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (n.imageUrl != null)
-                              ClipRRect(
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                                child: Image.network(n.imageUrl!, height: 90, width: double.infinity, fit: BoxFit.cover),
-                              ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(10, 8, 10, 4),
-                              child: Text(
-                                n.title,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                              child: Text(
-                                _fmt(n.date),
-                                style: theme.textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant),
-                              ),
-                            ),
-                            const Spacer(),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(10, 4, 10, 10),
-                              child: Text(
-                                'Baca selengkapnya',
-                                style: theme.textTheme.labelMedium?.copyWith(color: scheme.primary, fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+            // Untuk saat ini, data berita terkait belum diambil dari API secara terpisah.
+            // Bagian ini bisa diisi kemudian dengan pemanggilan API tambahan jika dibutuhkan.
           ],
         ),
       ),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import '../data/app_services.dart';
+import '../models/teacher.dart';
 import '../data/dummy_data.dart';
+import '../routes.dart';
 
 /// ---------------------------
 /// Helper Widgets
@@ -322,6 +325,15 @@ class TentangPage extends StatelessWidget {
               );
             }).toList(),
           ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () => Navigator.of(context).pushNamed(RoutePaths.teachers),
+              icon: const Icon(Icons.arrow_forward_rounded),
+              label: const Text('Lihat semua guru'),
+            ),
+          ),
           const SizedBox(height: 20),
 
           // --------------------------
@@ -329,19 +341,52 @@ class TentangPage extends StatelessWidget {
           // --------------------------
           _sectionTitle(context, 'Tim Pengajar'),
           const SizedBox(height: 8),
-          Column(
-            children: (DummyData.teachers ?? <dynamic>[]).map<Widget>((t) {
-              final String name = t.name ?? 'Nama Guru';
-              final String subject = t.subject ?? '';
-              return Card(
-                margin: const EdgeInsets.only(bottom: 8),
-                child: ListTile(
-                  leading: const CircleAvatar(child: Icon(Icons.person)),
-                  title: Text(name),
-                  subtitle: Text(subject),
-                ),
+          FutureBuilder<dynamic>(
+            future: apiService.teachers(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Text(
+                  'Gagal memuat data guru',
+                  style: theme.textTheme.bodyMedium?.copyWith(color: scheme.error),
+                );
+              }
+
+              final data = snapshot.data;
+              List<Teacher> teachers = [];
+              if (data is List) {
+                teachers = data
+                    .whereType<Map<String, dynamic>>()
+                    .map((e) => Teacher.fromApi(e))
+                    .toList();
+              }
+
+              if (teachers.isEmpty) {
+                return Text(
+                  'Belum ada data guru.',
+                  style: theme.textTheme.bodyMedium,
+                );
+              }
+
+              return Column(
+                children: teachers.map((t) {
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      leading: t.photoUrl != null
+                          ? CircleAvatar(
+                              backgroundImage: NetworkImage(t.photoUrl!),
+                            )
+                          : const CircleAvatar(child: Icon(Icons.person)),
+                      title: Text(t.name),
+                      subtitle: Text(t.subject),
+                    ),
+                  );
+                }).toList(),
               );
-            }).toList(),
+            },
           ),
           const SizedBox(height: 20),
 
@@ -366,42 +411,38 @@ class TentangPage extends StatelessWidget {
           ),
 
           const SizedBox(height: 24),
-          // Optional: Kontak singkat
+          // CTA: Tertarik bergabung? Hubungi kami
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: scheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: scheme.outline.withOpacity(.06)),
+              color: scheme.primary.withOpacity(.06),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: scheme.primary.withOpacity(.18)),
             ),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Kontak Sekolah', style: theme.textTheme.titleSmall),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(Icons.location_on_outlined),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(DummyData.address ?? 'Alamat sekolah belum diatur')),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  const Icon(Icons.phone_outlined),
-                  const SizedBox(width: 8),
-                  Text(DummyData.phone ?? '-'),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  const Icon(Icons.email_outlined),
-                  const SizedBox(width: 8),
-                  Text(DummyData.email ?? '-'),
-                ],
-              ),
-            ]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Tertarik bergabung?',
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Hubungi kami untuk informasi pendaftaran, kerja sama, atau kunjungan sekolah.',
+                  style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: FilledButton.icon(
+                    onPressed: () => Navigator.of(context).pushNamed(RoutePaths.contact),
+                    icon: const Icon(Icons.phone_in_talk_rounded),
+                    label: const Text('Hubungi kami'),
+                  ),
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 36),

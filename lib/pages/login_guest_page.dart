@@ -224,32 +224,6 @@ class _LoginGuestPageState extends State<LoginGuestPage> {
                                         ],
                                       ),
                                       const SizedBox(height: 8),
-                                      Container(
-                                        padding: const EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFF8FAFC),
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(color: scheme.outline.withOpacity(.4)),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Checkbox(value: false, onChanged: (_) {}),
-                                            const Text("I'm not a robot"),
-                                            const Spacer(),
-                                            Container(
-                                              width: 80,
-                                              height: 28,
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(6),
-                                                border: Border.all(color: scheme.outline.withOpacity(.5)),
-                                              ),
-                                              alignment: Alignment.center,
-                                              child: const Text('reCAPTCHA', style: TextStyle(fontSize: 10, color: Colors.black54)),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
                                       SizedBox(
                                         width: double.infinity,
                                         child: FilledButton.icon(

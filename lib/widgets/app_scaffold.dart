@@ -15,6 +15,7 @@ class AppScaffold extends StatefulWidget {
 
 class _AppScaffoldState extends State<AppScaffold> {
   int _index = 0;
+  bool _isChatOpen = false;
 
   final _pages = const [
     BerandaPage(),
@@ -22,61 +23,6 @@ class _AppScaffoldState extends State<AppScaffold> {
     BeritaPage(),
     TentangPage(),
   ];
-
-  void _showChatbotSheet(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: scheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Chatbot EduSpot',
-                    style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.of(ctx).pop(),
-                    icon: const Icon(Icons.close_rounded),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Tanyakan apa saja seputar sekolah, program keahlian, atau informasi PPDB.',
-                style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(color: Theme.of(ctx).colorScheme.onSurfaceVariant),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        Navigator.of(ctx).pop();
-                        Navigator.of(context).pushNamed(RoutePaths.chatbotAsk);
-                      },
-                      icon: const Icon(Icons.chat_bubble_outline_rounded),
-                      label: const Text('Buka Chat Lengkap'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +145,11 @@ class _AppScaffoldState extends State<AppScaffold> {
               child: FloatingActionButton(
                 key: ValueKey('fab_chatbot_$_index'),
                 heroTag: 'fab_chatbot_global',
-                onPressed: () => _showChatbotSheet(context),
+                onPressed: () {
+                  setState(() {
+                    _isChatOpen = !_isChatOpen;
+                  });
+                },
                 backgroundColor: scheme.primary,
                 foregroundColor: Colors.white,
                 child: Image.asset(
@@ -211,6 +161,142 @@ class _AppScaffoldState extends State<AppScaffold> {
               ),
             ),
           ),
+          if (_isChatOpen)
+            Positioned(
+              right: 16,
+              bottom: 188,
+              child: Material(
+                elevation: 14,
+                borderRadius: BorderRadius.circular(18),
+                clipBehavior: Clip.antiAlias,
+                child: Container
+                (
+                  width: 320,
+                  height: 420,
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        color: scheme.primary,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Text(
+                                  'Eduspot',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'Asisten SMKN 4 Bogor & pendidikan',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isChatOpen = false;
+                                });
+                              },
+                              icon: const Icon(Icons.close_rounded, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          color: scheme.surface,
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(.04),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Text(
+                                    'Halo, saya Botspot! Tanya apa saja seputar SMKN 4 Bogor atau pendidikan ya.',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: const [
+                                    _ChatSuggestionChip(label: 'Jurusan di SMKN 4'),
+                                    _ChatSuggestionChip(label: 'Info Ekstrakurikuler'),
+                                    _ChatSuggestionChip(label: 'Informasi PPDB'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: scheme.surface,
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(color: scheme.outline.withOpacity(.3)),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 14),
+                                child: const TextField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Ketik pertanyaan Anda...',
+                                    border: InputBorder.none,
+                                  ),
+                                  minLines: 1,
+                                  maxLines: 3,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            FilledButton(
+                              onPressed: () {},
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                shape: const StadiumBorder(),
+                              ),
+                              child: const Text('Kirim'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
       bottomNavigationBar: Padding(
@@ -260,6 +346,41 @@ class _AppScaffoldState extends State<AppScaffold> {
                   ],
                 ),
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ChatSuggestionChip extends StatelessWidget {
+  final String label;
+  const _ChatSuggestionChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: () {
+          // sementara: belum ada logika kirim otomatis
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: scheme.primary.withOpacity(.25)),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: scheme.primary,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
