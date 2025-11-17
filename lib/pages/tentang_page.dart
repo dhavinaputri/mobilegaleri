@@ -121,25 +121,98 @@ class TentangPage extends StatelessWidget {
     final scheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tentang Sekolah'),
-        centerTitle: true,
-        elevation: 0.5,
-      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           // --------------------------
-          // Sejarah Singkat
+          // Hero Profil Sekolah (International Feel)
           // --------------------------
-          _sectionTitle(context, 'Sejarah Singkat'),
-          const SizedBox(height: 8),
-          Text(
-            'Sekolah ini berdiri sejak tahun 1990 dan terus berkembang menjadi sekolah vokasi unggulan di Kota Bogor. '
-            'Selama puluhan tahun, sekolah aktif menjalin kerja sama dengan industri lokal dan menghasilkan lulusan yang siap kerja.',
-            style: theme.textTheme.bodyMedium,
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF2563EB), Color(0xFF4F46E5)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 18,
+                  offset: Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'SMKN 4 Bogor',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'International Vocational School',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                        color: Colors.white.withOpacity(.92),
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Mempersiapkan talenta global di era digital melalui kurikulum industri, kolaborasi internasional, dan lingkungan belajar yang modern.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.white.withOpacity(.9),
+                        height: 1.4,
+                      ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Akreditasi', style: theme.textTheme.labelSmall?.copyWith(color: Colors.white70)),
+                          const SizedBox(height: 2),
+                          Text('A (Unggul)', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Siswa Aktif', style: theme.textTheme.labelSmall?.copyWith(color: Colors.white70)),
+                          const SizedBox(height: 2),
+                          Text('1.200+ Siswa', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w700)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Icon(Icons.public_rounded, color: Colors.white.withOpacity(.9), size: 18),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        'Partnership dengan industri nasional & ASEAN untuk praktik dan magang.',
+                        style: theme.textTheme.labelSmall?.copyWith(color: Colors.white.withOpacity(.95)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
           // --------------------------
           // Profil Sekolah & Keunggulan

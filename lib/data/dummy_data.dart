@@ -15,9 +15,26 @@ class DummyData {
   ];
 
   static final programs = <ProgramKeahlian>[
-    ProgramKeahlian(id: 'rpl', name: 'Pengembangan Perangkat Lunak', description: 'Belajar pemrograman, mobile, web, dan basis data.'),
-    ProgramKeahlian(id: 'dkv', name: 'Desain Komunikasi Visual', description: 'Desain grafis, multimedia, dan animasi.'),
-    ProgramKeahlian(id: 'titl', name: 'Teknik Instalasi Tenaga Listrik', description: 'Instalasi listrik dan kelistrikan industri.'),
+    ProgramKeahlian(
+      id: 'pplg',
+      name: 'PPLG (Pengembangan Perangkat Lunak dan Gim)',
+      description: 'Fokus pada pemrograman web, mobile, dan pengembangan gim dengan teknologi terkini.',
+    ),
+    ProgramKeahlian(
+      id: 'tkjt',
+      name: 'TKJT (Teknik Komputer dan Jaringan Telekomunikasi)',
+      description: 'Jaringan komputer, sistem server, dan infrastruktur jaringan untuk dunia industri.',
+    ),
+    ProgramKeahlian(
+      id: 'tpfl',
+      name: 'TPFL (Teknik Pengelasan Fabrikasi Logam)',
+      description: 'Keahlian pengelasan dan fabrikasi logam untuk kebutuhan manufaktur.',
+    ),
+    ProgramKeahlian(
+      id: 'tkro',
+      name: 'TKRO (Teknik Kendaraan Ringan Otomotif)',
+      description: 'Perawatan dan perbaikan kendaraan ringan dengan standar bengkel modern.',
+    ),
   ];
 
   static final teachers = [
@@ -40,7 +57,8 @@ class DummyData {
       content: 'Detail persyaratan, jadwal, dan prosedur pendaftaran... ',
       category: 'Pengumuman',
       date: DateTime(2025, 1, 10),
-      imageUrl: null,
+      // Foto gerbang / suasana sekolah
+      imageUrl: 'https://images.pexels.com/photos/256395/pexels-photo-256395.jpeg?auto=compress&cs=tinysrgb&w=800',
     ),
     NewsItem(
       id: 'n2',
@@ -49,7 +67,8 @@ class DummyData {
       content: 'Laporan kegiatan bakti sosial... ',
       category: 'Kegiatan',
       date: DateTime(2025, 2, 5),
-      imageUrl: null,
+      // Foto siswa kegiatan di luar ruangan
+      imageUrl: 'https://images.pexels.com/photos/1089079/pexels-photo-1089079.jpeg?auto=compress&cs=tinysrgb&w=800',
     ),
     NewsItem(
       id: 'n3',
@@ -58,7 +77,8 @@ class DummyData {
       content: 'Cerita lengkap capaian siswa... ',
       category: 'Prestasi',
       date: DateTime(2025, 3, 2),
-      imageUrl: null,
+      // Foto piala / penghargaan
+      imageUrl: 'https://images.pexels.com/photos/261909/pexels-photo-261909.jpeg?auto=compress&cs=tinysrgb&w=800',
     ),
     NewsItem(
       id: 'n4',
@@ -67,14 +87,43 @@ class DummyData {
       content: 'Beberapa tips dan teknik belajar... ',
       category: 'Artikel',
       date: DateTime(2025, 4, 20),
-      imageUrl: null,
+      // Foto siswa belajar di kelas
+      imageUrl: 'https://images.pexels.com/photos/1720186/pexels-photo-1720186.jpeg?auto=compress&cs=tinysrgb&w=800',
     ),
   ];
 
   static final gallery = <GalleryItem>[
-    GalleryItem(id: 'g1', title: 'Upacara Bendera', category: 'Kegiatan', imageUrl: 'https://picsum.photos/seed/upacara/600/400', date: DateTime(2025, 1, 1)),
-    GalleryItem(id: 'g2', title: 'Lab Komputer', category: 'Fasilitas', imageUrl: 'https://picsum.photos/seed/lab/600/400', date: DateTime(2025, 1, 15)),
-    GalleryItem(id: 'g3', title: 'Piala Prestasi', category: 'Prestasi', imageUrl: 'https://picsum.photos/seed/piala/600/400', date: DateTime(2025, 2, 1)),
-    GalleryItem(id: 'g4', title: 'Kelas DKV', category: 'Fasilitas', imageUrl: 'https://picsum.photos/seed/dkv/600/400', date: DateTime(2025, 3, 9)),
+    GalleryItem(
+      id: 'g1',
+      title: 'Upacara Bendera',
+      category: 'Kegiatan',
+      // Lapangan sekolah / upacara
+      imageUrl: 'https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=800',
+      date: DateTime(2025, 1, 1),
+    ),
+    GalleryItem(
+      id: 'g2',
+      title: 'Lab Komputer',
+      category: 'Fasilitas',
+      // Siswa di lab komputer
+      imageUrl: 'https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=800',
+      date: DateTime(2025, 1, 15),
+    ),
+    GalleryItem(
+      id: 'g3',
+      title: 'Piala Prestasi',
+      category: 'Prestasi',
+      // Piala penghargaan
+      imageUrl: 'https://images.pexels.com/photos/1408355/pexels-photo-1408355.jpeg?auto=compress&cs=tinysrgb&w=800',
+      date: DateTime(2025, 2, 1),
+    ),
+    GalleryItem(
+      id: 'g4',
+      title: 'Kelas DKV',
+      category: 'Fasilitas',
+      // Ruang kelas modern
+      imageUrl: 'https://images.pexels.com/photos/1181395/pexels-photo-1181395.jpeg?auto=compress&cs=tinysrgb&w=800',
+      date: DateTime(2025, 3, 9),
+    ),
   ];
 }
