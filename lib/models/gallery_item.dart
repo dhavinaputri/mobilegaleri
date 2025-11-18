@@ -32,12 +32,12 @@ class GalleryItem {
       id: (json['id'] ?? '').toString(),
       title: (json['title'] ?? '') as String,
       category: kategoriName,
-      // Backend menyimpan gambar di public/galleries.
+      // Backend menyimpan gambar di public/images (mis. "galleries/...", "news/...").
       imageUrl: image.isEmpty
           ? image
           : (image.startsWith('http://') || image.startsWith('https://'))
               ? image
-              : 'https://eduspot.up.railway.app/$image',
+              : 'https://eduspot.up.railway.app/images/$image',
       date: parsedDate,
     );
   }

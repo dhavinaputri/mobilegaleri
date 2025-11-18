@@ -175,5 +175,20 @@ class ApiService {
   // ---------------------------
   // Chatbot (belum ada endpoint backend)
   // ---------------------------
-  Future<dynamic> chatbotAsk(String question) async => Future.error(UnimplementedError());
+  Future<dynamic> chatbotAsk(String question, {List<Map<String, String>>? context}) async {
+    final uri = _uri('/chatbot/ask');
+    final res = await http.post(
+      uri,
+      headers: _defaultHeaders(),
+      body: jsonEncode({
+        'message': question,
+        if (context != null && context.isNotEmpty) 'context': context,
+      }),
+    );
+    final data = _decodeBody(res);
+    if (data is Map<String, dynamic> && data['success'] == true) {
+      return data['answer'];
+    }
+    throw Exception(data is Map && data['error'] != null ? data['error'] : 'Chatbot error');
+  }
 }

@@ -46,12 +46,12 @@ class NewsItem {
       content: rawContent,
       category: categoryName,
       date: parsedDate,
-      // Jika backend mengirim path relatif (mis. "news/xxx.jpg"), coba konversi ke URL penuh.
+      // Jika backend mengirim path relatif (mis. "news/xxx.jpg"), konversi ke URL penuh di public/images.
       imageUrl: image == null || image.isEmpty
           ? null
           : (image.startsWith('http://') || image.startsWith('https://'))
               ? image
-              : 'https://eduspot.up.railway.app/storage/$image',
+              : 'https://eduspot.up.railway.app/images/$image',
     );
   }
 }
